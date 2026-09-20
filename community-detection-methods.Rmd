@@ -15,7 +15,8 @@ library(asnipe)
 library(igraph) 
 
 # creating a graph from Shizuka et al.(2014) network of golden-crowned sparrows
-assoc = as.matrix(read.csv("https://dshizuka.github.io/networkanalysis/SampleData/Sample_association.csv", header=T, row.names=1))
+sample_url <- "https://dshizuka.github.io/networkanalysis/SampleData/Sample_association.csv"
+assoc = as.matrix(read.csv(sample_url, header=T, row.names=1))
 
 # transposing the data
 gbi=t(assoc)  

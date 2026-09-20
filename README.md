@@ -1,28 +1,35 @@
 # Community Detection Methods
 
-An R/igraph analysis comparing Fast Greedy, Edge Betweenness (Girvan–Newman), and Louvain community-detection methods on a Golden-crowned Sparrow association network.
+This R/`igraph` portfolio analysis compares three community-detection algorithms on the Golden-crowned Sparrow association network from Shizuka et al. (2014): Fast Greedy, Edge Betweenness (Girvan–Newman), and Louvain.
 
-## Analysis sequence
+## Workflow and methods
 
-1. Download the sample association matrix published by Shizuka et al. (2014).
-2. Derive a weighted adjacency matrix with the Simple Ratio Index using `asnipe`.
-3. Construct an undirected weighted `igraph` graph.
-4. Run `cluster_fast_greedy()`, `cluster_edge_betweenness()`, and `cluster_louvain()`.
-5. Compare modularity, community count, memberships, community sizes, network plots, and dendrograms in the rendered report.
+1. Download the sample association matrix from the public URL in the R Markdown source.
+2. Transpose the matrix as required by the `asnipe` workflow.
+3. Convert associations to a weighted adjacency matrix with the Simple Ratio Index (`asnipe::get_network`).
+4. Build an undirected weighted `igraph` graph.
+5. Run `cluster_fast_greedy()`, `cluster_edge_betweenness()`, and `cluster_louvain()`.
+6. Compare dendrograms, network partitions, modularity, community counts, memberships, and community sizes.
 
-## Outputs
+Fast Greedy is hierarchical/agglomerative; Edge Betweenness is divisive and computationally intensive; Louvain is a multilevel modularity method. A fixed seed is used for plotted layouts where applicable. The rendered report is self-contained and contains plots, not an uploaded copy of the source CSV.
 
-- `community-detection-methods.Rmd` — reproducible source.
-- `community-detection-methods.html` — self-contained rendered report with the generated plots, dendrograms, method comparisons, and reported results.
+## Reproduction
 
-[Read the self-contained rendered report](community-detection-methods.html).
+Install R and the `asnipe` and `igraph` packages, then render `community-detection-methods.Rmd` with `rmarkdown::render()`. The source uses the public project-relative URL `https://dshizuka.github.io/networkanalysis/SampleData/Sample_association.csv`; no local absolute paths are required. Network access and the continued availability of that URL are prerequisites. Raw CSV/data files are intentionally omitted from this repository.
 
-## Findings and limitations
+## Results and limitations
 
-The source report found four communities for Fast Greedy and Louvain (modularity **0.609**) and three for Edge Betweenness (modularity **0.566**). These results are specific to this network, association measure, software versions, and random-state choices. Community detection is exploratory: modularity can favor particular structures, algorithms can produce different partitions, and the association index affects edge weights. The analysis does not establish biological causation or generalize beyond the supplied sample network. Re-run the source with pinned package versions and a verified data URL before treating the values as a reproducible benchmark.
+The source report found four communities for Fast Greedy and Louvain (modularity 0.609) and three for Edge Betweenness (modularity 0.566). These values are specific to this network, association index, package versions, and algorithm settings. Modularity can favor particular structures, algorithms can produce different partitions, and the association index affects edge weights. The analysis is exploratory and does not establish biological causation or generalize beyond the supplied sample network.
 
 ## Attribution
 
-Network data: Shizuka et al. (2014), sample association data hosted at `dshizuka.github.io/networkanalysis/SampleData/Sample_association.csv`. Packages: `asnipe` and `igraph`. Check the original publication, data terms, package versions, and URL availability before reuse.
+Network data: Shizuka et al. (2014), sample association data hosted at `dshizuka.github.io/networkanalysis/SampleData/Sample_association.csv`. Please consult the original publication and data terms before reuse. Software: R, `asnipe`, and `igraph`.
+
+## Repository contents
+
+- `community-detection-methods.Rmd` — source code and narrative.
+- `community-detection-methods.html` — rendered report reviewed for local-path and private-data safety.
+- `README.md` — workflow, methods, reproduction, attribution, and limitations.
+- `.gitignore` — excludes local data and generated/intermediate files.
 
 Author: Sarah Anderson.

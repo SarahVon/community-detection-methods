@@ -1,7 +1,14 @@
+# Local/private data
+*.csv
+*.xlsx
+*.xls
+*.RData
+*.rds
 .Rhistory
-.RData
 .Rproj.user/
 rsconnect/
 *.Rproj
+*.docx
+POSIT LINK.txt
 .DS_Store
 Thumbs.db
