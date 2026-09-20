@@ -1,0 +1,168 @@
+---
+title: "Analyzing Community Detection Methods"
+author: "Authored by: Sarah Anderson"
+output:
+  html_document:
+    toc: yes
+    toc_depth: '3'
+---
+
+# Setup code
+
+```{r, message=F,tidy=T, results='hide', fig.keep = 'all'}
+# install.packages(asnipe)
+library(asnipe)
+library(igraph) 
+
+# creating a graph from Shizuka et al.(2014) network of golden-crowned sparrows
+assoc = as.matrix(read.csv("https://dshizuka.github.io/networkanalysis/SampleData/Sample_association.csv", header=T, row.names=1))
+
+# transposing the data
+gbi=t(assoc)  
+
+# adjacency matrix based on "simple ratio index" (measure for animal network analysis)
+mat <- get_network(t(assoc), association_index="SRI") 
+
+# igraph object
+g.sparrow=graph_from_adjacency_matrix(mat, "undirected", weighted=T) 
+
+set.seed(246)
+# note weighted edges
+plot(g.sparrow, edge.width=E(g.sparrow)$weight, vertex.label="", main="Golden-crowned Sparrow Network", sub="Weighted Edges Reflect Shared Group Strength")
+```
+
+# Community Detection in Igraph
+
+Community detection in network analysis involves identifying tightly interconnected groups of nodes within a network. These communities emerge as clusters where nodes have strong connections among themselves, forming cohesive units. Uncovering these distinct communities allows us to gain insights into their internal dynamics within the overarching network structure. Algorithms such as Fastgreedy, Edge Betweenness, and Louvain are important in identifying and understanding these communities, enabling us to develop a deeper understanding of network relationships and behaviors. In this analysis, we will apply these algorithms to the Golden-crowned Sparrow network to identify and explore its community structure.
+
+## Fast Greedy
+
+Fastgreedy operates as a hierarchical, agglomerative method for community detection. Initially, each vertex stands as its own community, and through iterative merging, communities are combined to maximize modularity. The algorithm halts when further mergers no longer enhance modularity. While efficient, it may merge relatively small communities due to its immediate, "in-the-moment" decision-making.
+
+### Dendrogram
+
+```{r, tidy=T}
+# fast greedy algorithm
+fg = cluster_fast_greedy(g.sparrow) 
+
+# setting margins
+par(mar=c(2,2,2,0))
+# dendrogram
+plot_dendrogram(fg) 
+```
+
+### Network Plot
+
+```{r, tidy=T}
+set.seed(246)
+# community detection using Fast Greedy
+plot(fg, g.sparrow, vertex.label=NA, main="Fast Greedy Community Detection",
+     sub=paste("Modularity:", round(modularity(fg), 3)))
+```
+
+### Community Structure Metrics
+
+```{r}
+# modularity score
+modularity(fg) 
+# number of communities
+length(fg) 
+# community membership
+membership(fg) 
+# community sizes
+sizes(fg)
+```
+
+## Edge Betweenness (Girvan-Newman)
+
+The Edge Betweenness algorithm is a hierarchical, divisive method for community detection. It begins with the entire network as a single community and iteratively removes edges with high betweenness centrality to form new components, creating a nested structure. It is a computationally intensive algorithm but can be effective for smaller networks.
+
+### Dendrogram
+
+```{r, message=F,tidy=T, warning=F}
+# edge betweenness algorithm
+eb = cluster_edge_betweenness(g.sparrow, modularity = T) 
+
+# set margins
+par(mar=c(2,2,2,0))
+# dendrogram
+plot_dendrogram(eb, mode = "hclust") 
+```
+
+### Network Plot
+
+```{r,tidy=T}
+set.seed(246)
+# community detection using Edge Betweenness
+plot(eb, g.sparrow, vertex.label=NA, main="Edge Betweenness Community Detection",
+     sub=paste("Modularity:", round(modularity(eb), 3)))
+```
+
+### Community Structure Metrics
+
+```{r}
+# modularity score
+modularity(eb) 
+# number of communities
+length(eb) 
+# community membership
+membership(eb)
+# community sizes
+sizes(eb) 
+```
+
+## Louvain (Multi-level)
+
+Like Fast Greedy, Louvain starts with each vertex in its own community. When moving nodes between communities, it emphasizes local contributions to overall modularity. Once modularity improvement ceases, communities are collapsed into single nodes, and the process continues. Unlike Fastgreedy, Louvain is particularly adept at detecting smaller, distinct communities, making it more robust across all network sizes.
+
+### Network Plot
+
+```{r,tidy=T}
+# Louvain algorithm
+multi <- cluster_louvain(g.sparrow)
+set.seed(246)
+# community detection using Louvain
+plot(multi, g.sparrow, vertex.label=NA, main="Louvain Community Detection",
+     sub=paste("Modularity:", round(modularity(multi), 3)))
+```
+
+### Community Structure Metrics
+
+```{r}
+# modularity score
+modularity(multi)
+# number of communities
+length(multi)
+# community membership
+membership(multi)
+# community sizes
+sizes(multi)
+```
+
+## Algorithm Comparison
+
+Now, we can compare the community structures identified by the Fastgreedy, Edge Betweenness, and Louvain algorithms by plotting them side by side.
+
+```{r,tidy=T, fig.width=10, fig.height=5}
+set.seed(246)
+par(mfrow=c(1,3), mar = c(8,2,5,2))
+# Fast Greedy
+plot(fg, g.sparrow, vertex.label=NA, main="Fast Greedy",
+     sub=paste("Modularity:", round(modularity(fg), 3)))
+
+set.seed(246)
+# Edge Betweenness
+plot(eb, g.sparrow, vertex.label=NA, main="Edge Betweenness",
+     sub=paste("Modularity:", round(modularity(eb), 3)))
+
+set.seed(246)
+# Louvain
+plot(multi, g.sparrow, vertex.label=NA, main="Louvain",
+     sub=paste("Modularity:", round(modularity(multi), 3)))
+```
+
+### Conclusion
+
+By applying Fast Greedy, Edge Betweenness, and Louvain algorithms to the Golden-crowned Sparrow network, we could identify distinct community structures within the network and see the differences in community detection methods. Both the Fast Greedy and Louvain algorithms identified four communities, with both having a Modularity score of 0.609, while the Edge Betweenness algorithm identified three communities with a Modularity score of 0.566. For that reason, I would think the optimal number of communities for this network is likely four.
+
+Each algorithm has its strengths and weaknesses, with Fast Greedy being efficient but potentially merging small communities, Edge Betweenness being computationally intensive but effective for smaller networks, and Louvain being robust across all network sizes and adept at detecting smaller, distinct communities. Understanding these community structures can help us gain a deeper understanding of the Golden-crowned Sparrow network.
