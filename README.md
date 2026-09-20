@@ -54,11 +54,11 @@ The source sets a random seed (`246`) for network layouts where a plotted layout
 
 ## Data acquisition and attribution
 
-The analysis reads the public sample association file directly from the source maintained by Shizuka and collaborators:
+I read the public sample association file directly from the source maintained by Shizuka and collaborators:
 
 <https://dshizuka.github.io/networkanalysis/SampleData/Sample_association.csv>
 
-The repository does **not** upload or redistribute the raw CSV. Rendering requires internet access and depends on that public URL remaining available. The data and scientific context should be attributed to the original source and publication; this repository documents the analysis workflow rather than claiming ownership of the observations.
+I do **not** upload or redistribute the raw CSV. Rendering requires internet access and depends on that public URL remaining available. I attribute the data and scientific context to the original source and publication; the source files document the analysis workflow rather than claiming ownership of the observations.
 
 ## Import and preparation
 
@@ -204,7 +204,7 @@ Important limitations include:
 
 ## Reproducibility
 
-Clone or download this repository, ensure R and the packages above are installed, and render the source report from the repository directory:
+With R and the packages above installed, render the source report from the project directory:
 
 ```r
 rmarkdown::render("community-detection-methods.Rmd")
