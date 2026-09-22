@@ -2,7 +2,7 @@
 
 [View the rendered analysis](https://01a0bbd5-5c89-a860-3c73-6fdd567d84b2.share.connect.posit.cloud/) · [View the R Markdown source](community-detection-methods.Rmd)
 
-This project uses **R**, `asnipe`, and `igraph` to compare three community-detection algorithms on a weighted association network of golden-crowned sparrows. Fast Greedy, Edge Betweenness (Girvan–Newman), and Louvain are applied to the same graph so their partitions can be compared by community count, membership, community size, modularity, and network structure.
+This project uses `R`, `asnipe`, and `igraph` to compare three community-detection algorithms on a weighted association network of golden-crowned sparrows. Fast Greedy, Edge Betweenness (Girvan–Newman), and Louvain are applied to the same graph so their partitions can be compared by community count, membership, community size, modularity, and network structure.
 
 The analysis demonstrates an important feature of network modeling: a community is not an observed label already present in the data. It is a structure inferred by an algorithm, and different algorithms can produce different, but still plausible, summaries of the same network.
 
@@ -53,8 +53,15 @@ The workflow was:
 Fast Greedy is a hierarchical, agglomerative method. It begins with each node in its own community and repeatedly merges communities when doing so produces the largest available increase in modularity. The sequence of mergers can be displayed as a dendrogram.
 
 For this network, Fast Greedy identified **four communities** with sizes **9, 6, 5, and 5** and a modularity of **0.609**.
+ 
+![Fast Greedy community-detection dendrogram](dendrogram-fast-greedy.png)
 
-[View the Fast Greedy network](fast-greedy.png) · [View the Fast Greedy dendrogram](dendrogram-fast-greedy.png)
+*The Fast Greedy dendrogram (above) shows the sequence of community mergers and the four-community cut used in the final partition.*
+
+
+![Fast Greedy community detection result](fast-greedy.png)
+
+*Fast Greedy partition of the sparrow network into four communities.*
 
 ### Edge Betweenness
 
@@ -62,7 +69,13 @@ Edge Betweenness, also known as the Girvan–Newman approach, is hierarchical an
 
 For this network, Edge Betweenness identified **three communities** with sizes **13, 7, and 5** and a modularity of **0.566**.
 
-[View the Edge Betweenness network](edge-betweenness-girvan-newman.png) · [View the Edge Betweenness dendrogram](dendrogram-edge-betweenness.png)
+![Edge Betweenness community detection result](edge-betweenness-girvan-newman.png)
+
+*The Edge Betweenness dendrogram (above) shows the divisive hierarchy created as high-betweenness connections are removed.*
+
+![Edge Betweenness community-detection dendrogram](dendrogram-edge-betweenness.png)
+
+*Edge Betweenness partition of the sparrow network into three communities.*
 
 ### Louvain
 
@@ -70,7 +83,9 @@ Louvain is a multilevel modularity-optimization method. It first moves individua
 
 For this network, Louvain identified **four communities** with sizes **9, 6, 5, and 5** and a modularity of **0.609**. Although the numeric community labels differ from the Fast Greedy output, the individual memberships form the same four groups.
 
-[View the Louvain network](louvain-multilevel.png)
+![Louvain community detection result](louvain-multilevel.png)
+
+*Louvain partition of the sparrow network into four communities.*
 
 ## Results
 
@@ -115,15 +130,15 @@ The R Markdown file downloads the public CSV at render time, so reproduction req
 
 ## Repository contents
 
-```text
-community-detection-methods.Rmd          Analysis source
-community-detection-methods.html         Rendered report
-golden-crowned-sparrow.png               Weighted association network
-algorithm-comparison.png                 Side-by-side method comparison
-dendrogram-fast-greedy.png               Fast Greedy hierarchy
-fast-greedy.png                          Fast Greedy partition
-dendrogram-edge-betweenness.png          Edge Betweenness hierarchy
-edge-betweenness-girvan-newman.png       Edge Betweenness partition
-louvain-multilevel.png                    Louvain partition
-README.md                                Project documentation
-```
+| File | Description |
+| --- | --- |
+| [`community-detection-methods.Rmd`](community-detection-methods.Rmd) | R Markdown analysis source |
+| [`community-detection-methods.html`](community-detection-methods.html) | Rendered analysis report |
+| [`golden-crowned-sparrow.png`](golden-crowned-sparrow.png) | Original weighted association network |
+| [`algorithm-comparison.png`](algorithm-comparison.png) | Side-by-side comparison of all three methods |
+| [`dendrogram-fast-greedy.png`](dendrogram-fast-greedy.png) | Fast Greedy hierarchical structure |
+| [`fast-greedy.png`](fast-greedy.png) | Fast Greedy community partition |
+| [`dendrogram-edge-betweenness.png`](dendrogram-edge-betweenness.png) | Edge Betweenness hierarchical structure |
+| [`edge-betweenness-girvan-newman.png`](edge-betweenness-girvan-newman.png) | Edge Betweenness community partition |
+| [`louvain-multilevel.png`](louvain-multilevel.png) | Louvain community partition |
+| `README.md` | Project documentation |
