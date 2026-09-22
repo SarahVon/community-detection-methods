@@ -1,65 +1,129 @@
-# Community Detection Methods
+# Comparing Community Detection Methods in a Sparrow Association Network
 
-**Published results:** [Read the rendered report](https://01a0bbd5-5c89-a860-3c73-6fdd567d84b2.share.connect.posit.cloud/)  
-**Public source:** [`community-detection-methods.Rmd`](community-detection-methods.Rmd)
+[View the rendered analysis](https://01a0bbd5-5c89-a860-3c73-6fdd567d84b2.share.connect.posit.cloud/) · [View the R Markdown source](community-detection-methods.Rmd)
 
-I use a weighted association network of golden-crowned sparrows to compare Fast Greedy, Edge Betweenness (Girvan–Newman), and Louvain community detection in R/`igraph`.
+This project uses **R**, `asnipe`, and `igraph` to compare three community-detection algorithms on a weighted association network of golden-crowned sparrows. Fast Greedy, Edge Betweenness (Girvan–Newman), and Louvain are applied to the same graph so their partitions can be compared by community count, membership, community size, modularity, and network structure.
 
-## Purpose
+The analysis demonstrates an important feature of network modeling: a community is not an observed label already present in the data. It is a structure inferred by an algorithm, and different algorithms can produce different, but still plausible, summaries of the same network.
 
-This analysis examines how three algorithms partition the same observed association network and how their modularity, community counts, and structural interpretations compare. The partitions describe this sample graph; they do not establish biological causation or fixed social groups.
+## Project goals
 
-## Setup and data
+- Convert group-by-individual observations into a weighted association network.
+- Use the Simple Ratio Index to quantify pairwise association strength.
+- Compare agglomerative, divisive, and multilevel approaches to community detection.
+- Evaluate the resulting partitions using modularity, community counts, sizes, and membership.
+- Visualize both the network partitions and the hierarchical structure of applicable methods.
+- Explain why algorithm choice matters when interpreting social-network structure.
 
-Install `asnipe`, `igraph`, and `rmarkdown`. The Rmd reads the public sample association file maintained by Shizuka and collaborators:
+## Data and network construction
 
-<https://dshizuka.github.io/networkanalysis/SampleData/Sample_association.csv>
+The analysis uses the public [sample association dataset](https://dshizuka.github.io/networkanalysis/SampleData/Sample_association.csv) provided with network-analysis teaching materials by Shizuka and collaborators. The observations describe which individually identified golden-crowned sparrows were recorded in the same groups.
 
-The raw CSV is not redistributed. Rendering therefore requires internet access and continued availability of that URL.
+I imported the group-by-individual data and used `asnipe::get_network()` with the **Simple Ratio Index (SRI)** to calculate pairwise association strengths. SRI values summarize the proportion of observed opportunities in which two individuals occurred together. The resulting adjacency matrix was converted into an undirected, weighted `igraph` network containing **25 birds**.
 
-## Workflow
+![Weighted golden-crowned sparrow association network](golden-crowned-sparrow.png)
 
-1. Import and transpose the group-by-individual observations.
-2. Calculate pairwise association strengths with the Simple Ratio Index (SRI).
-3. Build an undirected weighted `igraph` graph.
-4. Run each community algorithm and record modularity, membership, and community sizes.
-5. Compare the partitions with network plots and, for the hierarchical methods, dendrograms.
+*Each node represents an individual sparrow. Edges represent observed association, with greater width indicating a higher SRI value.*
 
-SRI weights represent observed association opportunities in this sample, not friendship, causation, or fitness.
+These weights describe co-occurrence in the supplied observations. They should not automatically be interpreted as friendship, preference, causation, or biological fitness.
 
-## Methods and results
+## Tools and methods
 
-![Golden-crowned Sparrow association network](golden-crowned-sparrow.png)
+The project was completed in **R** and documented in **R Markdown** using:
 
-*Weighted association network; thicker edges indicate stronger SRI association.*
+- `asnipe` for constructing the association matrix
+- `igraph` for graph creation, community detection, modularity, membership, and plotting
+- `rmarkdown` for combining code, results, interpretation, and figures in a reproducible report
+- A fixed random seed (`246`) for consistent network layouts
 
-- **Fast Greedy:** four communities, modularity **0.609**.
-- **Edge Betweenness:** three communities, modularity **0.566**.
-- **Louvain:** four communities, modularity **0.609**.
+The workflow was:
 
-![Fast Greedy, Edge Betweenness, and Louvain comparison](algorithm-comparison.png)
+1. Import the association observations.
+2. Transpose the group-by-individual structure into the orientation required for network construction.
+3. Calculate pairwise SRI association values.
+4. Create an undirected weighted graph.
+5. Apply all three community-detection algorithms to the same graph.
+6. Record modularity, number of communities, memberships, and community sizes.
+7. Compare the partitions visually and numerically.
 
-Fast Greedy and Louvain support the same four-community summary for this graph, while Edge Betweenness produces a broader three-community partition by removing high-betweenness bridges. Community count remains dependent on the algorithm and modeling choices.
+## Community detection methods
 
-The individual figures are [`dendrogram-fast-greedy.png`](dendrogram-fast-greedy.png), [`fast-greedy.png`](fast-greedy.png), [`dendrogram-edge-betweenness.png`](dendrogram-edge-betweenness.png), [`edge-betweenness-girvan-newman.png`](edge-betweenness-girvan-newman.png), and [`louvain-multilevel.png`](louvain-multilevel.png).
+### Fast Greedy
 
-## Limitations
+Fast Greedy is a hierarchical, agglomerative method. It begins with each node in its own community and repeatedly merges communities when doing so produces the largest available increase in modularity. The sequence of mergers can be displayed as a dendrogram.
 
-Results reflect the supplied observation process, SRI choice, graph construction, algorithm settings, and layout/package versions. Modularity is scale-dependent, and the sample should not be generalized beyond this network.
+For this network, Fast Greedy identified **four communities** with sizes **9, 6, 5, and 5** and a modularity of **0.609**.
 
-## Reproducibility
+[View the Fast Greedy network](fast-greedy.png) · [View the Fast Greedy dendrogram](dendrogram-fast-greedy.png)
 
-With R and the packages above installed, render:
+### Edge Betweenness
+
+Edge Betweenness, also known as the Girvan–Newman approach, is hierarchical and divisive. It begins with the full network and repeatedly removes edges that lie on many shortest paths. Those high-betweenness edges often act as bridges between otherwise cohesive parts of the graph.
+
+For this network, Edge Betweenness identified **three communities** with sizes **13, 7, and 5** and a modularity of **0.566**.
+
+[View the Edge Betweenness network](edge-betweenness-girvan-newman.png) · [View the Edge Betweenness dendrogram](dendrogram-edge-betweenness.png)
+
+### Louvain
+
+Louvain is a multilevel modularity-optimization method. It first moves individual nodes among nearby communities to improve modularity, then collapses the resulting communities into higher-level nodes and repeats the process.
+
+For this network, Louvain identified **four communities** with sizes **9, 6, 5, and 5** and a modularity of **0.609**. Although the numeric community labels differ from the Fast Greedy output, the individual memberships form the same four groups.
+
+[View the Louvain network](louvain-multilevel.png)
+
+## Results
+
+| Method | Strategy | Communities | Community sizes | Modularity |
+| --- | --- | ---: | --- | ---: |
+| Fast Greedy | Agglomerative modularity optimization | 4 | 9, 6, 5, 5 | 0.609 |
+| Edge Betweenness | Divisive bridge removal | 3 | 13, 7, 5 | 0.566 |
+| Louvain | Multilevel modularity optimization | 4 | 9, 6, 5, 5 | 0.609 |
+
+![Comparison of Fast Greedy, Edge Betweenness, and Louvain partitions](algorithm-comparison.png)
+
+*The node positions are held consistent across the three plots so differences in community assignment can be compared directly.*
+
+Fast Greedy and Louvain produced the same four-community partition and the same modularity score. Their agreement provides stronger support for this four-group representation than community count alone would provide. Edge Betweenness produced a broader three-community partition, combining or reassigning nodes that the modularity-optimization methods separated.
+
+Within this analysis, the four-community partition is the best-supported summary because it was independently recovered by two methods and achieved the highest observed modularity. That conclusion remains specific to this graph, weight construction, and algorithm configuration; it does not prove that four fixed social groups exist in the underlying sparrow population.
+
+## Interpretation and limitations
+
+- Community detection is exploratory and algorithm-dependent. A partition is a model of structure, not direct evidence of a permanent biological group.
+- The network depends on the original sampling design, observation effort, missing observations, and the decision to use SRI.
+- SRI values represent association strengths. Some shortest-path algorithms interpret numeric edge weights as distances or costs, where larger values mean farther apart. Using association strengths directly in Edge Betweenness can therefore affect its partition; an inverse-distance transformation would be worth evaluating in a follow-up analysis.
+- Modularity is useful for comparing partitions on the same graph, but it has known scale and resolution limitations. A higher value does not automatically make a partition biologically correct.
+- The analysis compares one small sample network and should not be generalized to other populations, seasons, or species.
+- Package updates can change default behavior, layouts, or numerical output. The project does not currently lock package versions.
+
+## Reproducing the analysis
+
+Install the required packages in R:
+
+```r
+install.packages(c("asnipe", "igraph", "rmarkdown"))
+```
+
+Then render the report from the repository root:
 
 ```r
 rmarkdown::render("community-detection-methods.Rmd")
 ```
 
-The render step downloads the public CSV at runtime; checked-in PNGs document the published outputs.
+The R Markdown file downloads the public CSV at render time, so reproduction requires internet access and continued availability of the source URL. The checked-in HTML report and PNG figures preserve the published outputs if the remote file changes or becomes unavailable.
 
 ## Repository contents
 
-- `community-detection-methods.Rmd` — analysis source
-- `community-detection-methods.html` — rendered report
-- PNG files — network, dendrogram, and comparison figures
-- `README.md` — methods, results, attribution, and reproduction notes
+```text
+community-detection-methods.Rmd          Analysis source
+community-detection-methods.html         Rendered report
+golden-crowned-sparrow.png               Weighted association network
+algorithm-comparison.png                 Side-by-side method comparison
+dendrogram-fast-greedy.png               Fast Greedy hierarchy
+fast-greedy.png                          Fast Greedy partition
+dendrogram-edge-betweenness.png          Edge Betweenness hierarchy
+edge-betweenness-girvan-newman.png       Edge Betweenness partition
+louvain-multilevel.png                    Louvain partition
+README.md                                Project documentation
+```
